@@ -2,12 +2,6 @@ import Profile from "@components/Profile";
 import { ChangeEvent, FormEvent, useState, useEffect } from "react";
 import { getRoleBasedOnToken } from "src/utils/getRoleBasedOnToken";
 import { useNavigate } from "react-router-dom";
-import { getDriver } from "@services/driver/getDriver";
-import { getPassenger } from "@services/passenger/getPassenger";
-import { updateDriverInfo } from "@services/driver/updateDriverInfo";
-import { updatePassenger } from "@services/passenger/updatePassenger";
-import { deleteDriver } from "@services/driver/deleteDriver";
-import { deletePassenger } from "@services/passenger/deletePassenger";
 import { useAuthContext } from "@contexts/AuthContext";
 
 export default function EditProfilePage() {
@@ -25,29 +19,29 @@ export default function EditProfilePage() {
 	}, []);
 
 	async function fetchUserData() {
-		try {
-			const role = getRoleBasedOnToken();
-			if (role === "ROLE_DRIVER") {
-				const driver = await getDriver();
-				setUserId(driver.id);
-				setFormData({
-					firstName: driver.firstName,
-					lastName: driver.lastName,
-					phoneNumber: driver.phoneNumber
-				});
-			} else if (role === "ROLE_PASSENGER") {
-				const passenger = await getPassenger();
-				// Note: Passenger doesn't have ID in response, handle accordingly
-				setUserId(passenger.id);  
-				setFormData({
-					firstName: passenger.firstName,
-					lastName: passenger.lastName,
-					phoneNumber: passenger.phoneNumber
-				});
-			}
-		} catch (error) {
-			console.error("Error fetching user data:", error);
-		}
+		// try {
+		// 	const role = getRoleBasedOnToken();
+		// 	if (role === "ROLE_DRIVER") {
+		// 		const driver = await getDriver();
+		// 		setUserId(driver.id);
+		// 		setFormData({
+		// 			firstName: driver.firstName,
+		// 			lastName: driver.lastName,
+		// 			phoneNumber: driver.phoneNumber
+		// 		});
+		// 	} else if (role === "ROLE_PASSENGER") {
+		// 		const passenger = await getPassenger();
+		// 		// Note: Passenger doesn't have ID in response, handle accordingly
+		// 		setUserId(passenger.id);
+		// 		setFormData({
+		// 			firstName: passenger.firstName,
+		// 			lastName: passenger.lastName,
+		// 			phoneNumber: passenger.phoneNumber
+		// 		});
+		// 	}
+		// } catch (error) {
+		// 	console.error("Error fetching user data:", error);
+		// }
 	}
 
 	function handleChange(e: ChangeEvent<HTMLInputElement>) {
@@ -60,40 +54,40 @@ export default function EditProfilePage() {
 
 	async function fetchDeleteUser() {
 		if (!userId) return;
-		try {
-			if (getRoleBasedOnToken() === "ROLE_DRIVER") {
-				await deleteDriver(userId);
-			} else if (getRoleBasedOnToken() === "ROLE_PASSENGER") {
-				await deletePassenger(userId);
-			}
-			localStorage.removeItem("token");
-			logout();
-			navigate("/auth/login");
-		} catch (error) {
-			console.error("Error deleting user:", error);
-		}
+		// try {
+		// 	if (getRoleBasedOnToken() === "ROLE_DRIVER") {
+		// 		await deleteDriver(userId);
+		// 	} else if (getRoleBasedOnToken() === "ROLE_PASSENGER") {
+		// 		await deletePassenger(userId);
+		// 	}
+		// 	localStorage.removeItem("token");
+		// 	logout();
+		// 	navigate("/auth/login");
+		// } catch (error) {
+		// 	console.error("Error deleting user:", error);
+		// }
 	}
 
 	async function fetchUpdateUser() {
-		try {
-			if (getRoleBasedOnToken() === "ROLE_DRIVER") {
-			if (!userId) return;
-				await updateDriverInfo(userId, {
-					firstName: formData.firstName, // Typo matches the interface
-					lastName: formData.lastName,
-					phoneNumber: formData.phoneNumber
-				});
-			} else {
-				if (!userId) return;               // ahora sí existe
-				await updatePassenger({
-				firstName: formData.firstName,
-				lastName:  formData.lastName,
-				phoneNumber: formData.phoneNumber
-				});
-			}
-		} catch (error) {
-			console.error("Error updating user:", error);
-		}
+		// try {
+		// 	if (getRoleBasedOnToken() === "ROLE_DRIVER") {
+		// 	if (!userId) return;
+		// 		await updateDriverInfo(userId, {
+		// 			firstName: formData.firstName, // Typo matches the interface
+		// 			lastName: formData.lastName,
+		// 			phoneNumber: formData.phoneNumber
+		// 		});
+		// 	} else {
+		// 		if (!userId) return;               // ahora sí existe
+		// 		await updatePassenger({
+		// 		firstName: formData.firstName,
+		// 		lastName:  formData.lastName,
+		// 		phoneNumber: formData.phoneNumber
+		// 		});
+		// 	}
+		// } catch (error) {
+		// 	console.error("Error updating user:", error);
+		// }
 	}
 
 	async function handleSubmit(e: FormEvent<HTMLFormElement>) {

@@ -1,25 +1,26 @@
 import { RegisterRequest } from "@interfaces/auth/RegisterRequest";
-import { ChangeEvent, FormEvent, Dispatch, SetStateAction } from "react";
+import { ChangeEvent, FormEvent, Dispatch, SetStateAction, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuthContext } from "@contexts/AuthContext";
+import {PhotoUpload} from "@components/PhotoUpload.tsx";
 
 interface RegisterFormProps {
-	setVehicleRegister: Dispatch<SetStateAction<boolean>>;
-	formData: RegisterRequest & { isDriver?: boolean };
-	setFormData: Dispatch<SetStateAction<RegisterRequest & { isDriver?: boolean }>>;
+	formData: RegisterRequest & { isClient: boolean };
+	setFormData: Dispatch<SetStateAction<RegisterRequest & { isClient: boolean}>>;
 }
 
-export default function RegisterForm(props: RegisterFormProps) {
+export default function RegisterForm (props: RegisterFormProps){
+	const [confirmPassword, setConfirmPassword] = useState<string>("");
 	const navigate = useNavigate();
 	const { register } = useAuthContext();
 
-	function handleChange(e: ChangeEvent<HTMLInputElement>) {
+	function handleChange(e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) {
 		const { name, value, type } = e.target;
-		
-		if (type === "radio" && name === "isDriver") {
+
+		if (type === "radio" && name === "isClient") {
 			props.setFormData(prev => ({
 				...prev,
-				isDriver: value === "true"
+				isClient: value === "true"
 			}));
 		} else {
 			props.setFormData(prev => ({
@@ -29,125 +30,187 @@ export default function RegisterForm(props: RegisterFormProps) {
 		}
 	}
 
-	async function handleSubmit(e: FormEvent<HTMLFormElement>) {
+	const handlePhotoChange = (file: File | null) => {
+		props.setFormData(prev => ({
+			...prev,
+			photo: file
+		}));
+	};
+
+	async function handleSubmit(e: FormEvent) {
 		e.preventDefault();
 
-		if (props.formData.isDriver) {
-			// Si es conductor, mostrar el formulario de vehículo
-			props.setVehicleRegister(true);
-		} else {
-			// Si es pasajero, registrar directamente
-			try {
-				await register(props.formData);
-				// Asumimos que el registro fue exitoso si no lanza error
-				navigate("/dashboard");
-			} catch (error: any) {
-				console.error("Error al registrar:", error);
-			}
+		if (props.formData.password !== confirmPassword) {
+			alert('Las contraseñas no coinciden');
+			return;
+		}
+
+		try {
+			await register(props.formData, props.formData.isClient);
+			navigate("/dasboard")
+		}catch (error: any) {
+			console.error("Error al registrar:", error);
 		}
 	}
 
 	return (
-		<section className="login-section bg-secondary p-8 rounded-2xl shadow-lg">
-			<h1 className="text-3xl font-bold mb-6">Registrarse a Uber</h1>
-			<form onSubmit={handleSubmit} className="space-y-4">
+		<div className="p-10">
+			<h2 className="text-gray-900 mb-8 text-2xl font-semibold">
+				Crear una cuenta
+			</h2>
+			<div className="space-y-5">
+				<div className="flex gap-4">
+					<div className="flex-1">
+						<label htmlFor="firstName" className="block mb-2 text-gray-700 font-medium text-sm">
+							Nombre
+						</label>
+						<input
+							type="text"
+							name="nombre"
+							id="nombre"
+							value={props.formData.nombre || ""}
+							onChange={handleChange}
+							placeholder="Tu nombre"
+							className="w-full py-3 px-4 border-2 border-gray-200 rounded-lg text-base transition-all duration-300 bg-gray-50 focus:outline-none focus:border-blue-500 focus:bg-white"
+							required
+						/>
+					</div>
+					<div className="flex-1">
+						<label htmlFor="lastName" className="block mb-2 text-gray-700 font-medium text-sm">
+							Apellidos
+						</label>
+						<input
+							type="text"
+							name="apellido"
+							id="apellido"
+							value={props.formData.apellido || ""}
+							onChange={handleChange}
+							placeholder="Tus apellidos"
+							className="w-full py-3 px-4 border-2 border-gray-200 rounded-lg text-base transition-all duration-300 bg-gray-50 focus:outline-none focus:border-blue-500 focus:bg-white"
+							required
+						/>
+					</div>
+				</div>
+
 				<div>
-					<label htmlFor="firstName" className="block text-sm font-medium mb-2">Nombres</label>
+					<label htmlFor="email" className="block mb-2 text-gray-700 font-medium text-sm">
+						Correo electrónico
+					</label>
 					<input
-						type="text"
-						name="firstName"
-						id="firstName"
-						value={props.formData.firstName || ""}
+						type="email"
+						name="email"
+						id="email"
+						value={props.formData.email || ""}
 						onChange={handleChange}
-						className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+						placeholder="ejemplo@correo.com"
+						className="w-full py-3 px-4 border-2 border-gray-200 rounded-lg text-base transition-all duration-300 bg-gray-50 focus:outline-none focus:border-blue-500 focus:bg-white"
 						required
 					/>
 				</div>
+
 				<div>
-					<label htmlFor="lastName" className="block text-sm font-medium mb-2">Apellidos</label>
+					<label htmlFor="phone" className="block mb-2 text-gray-700 font-medium text-sm">
+						Celular
+					</label>
 					<input
-						type="text"
-						name="lastName"
-						id="lastName"
-						value={props.formData.lastName || ""}
+						type="tel"
+						name="telefono"
+						id="telefono"
+						value={props.formData.telefono || ""}
 						onChange={handleChange}
-						className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+						placeholder="Tu número de celular"
+						className="w-full py-3 px-4 border-2 border-gray-200 rounded-lg text-base transition-all duration-300 bg-gray-50 focus:outline-none focus:border-blue-500 focus:bg-white"
 						required
 					/>
 				</div>
+
+				<PhotoUpload onPhotoChange={handlePhotoChange} />
+
 				<div>
-					<label htmlFor="email" className="block text-sm font-medium mb-2">Email</label>
-					<input 
-						type="email" 
-						name="email" 
-						id="email" 
-						value={props.formData.email || ""} 
-						onChange={handleChange}
-						className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
-						required
-					/>
-				</div>
-				<div>
-					<label htmlFor="password" className="block text-sm font-medium mb-2">Contraseña</label>
+					<label htmlFor="password" className="block mb-2 text-gray-700 font-medium text-sm">
+						Contraseña
+					</label>
 					<input
 						type="password"
 						name="password"
 						id="password"
 						value={props.formData.password || ""}
 						onChange={handleChange}
-						className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+						placeholder="••••••••"
+						className="w-full py-3 px-4 border-2 border-gray-200 rounded-lg text-base transition-all duration-300 bg-gray-50 focus:outline-none focus:border-blue-500 focus:bg-white"
 						required
 					/>
 				</div>
+
 				<div>
-					<label htmlFor="phone" className="block text-sm font-medium mb-2">Celular</label>
-					<input 
-						type="text" 
-						name="phone" 
-						id="phone" 
-						value={props.formData.phone || ""} 
-						onChange={handleChange}
-						className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+					<label htmlFor="confirmPassword" className="block mb-2 text-gray-700 font-medium text-sm">
+						Confirmar contraseña
+					</label>
+					<input
+						type="password"
+						name="confirmPassword"
+						id="confirmPassword"
+						value={confirmPassword}
+						onChange={(e) => setConfirmPassword(e.target.value)}
+						placeholder="••••••••"
+						className="w-full py-3 px-4 border-2 border-gray-200 rounded-lg text-base transition-all duration-300 bg-gray-50 focus:outline-none focus:border-blue-500 focus:bg-white"
 						required
 					/>
 				</div>
+
 				<div>
-					<label className="block text-sm font-medium mb-2">¿Eres Conductor?</label>
+					<label className="block text-sm font-medium mb-2">Tipo de usuario</label>
 					<div className="flex gap-4">
 						<label className="flex items-center">
 							<input
 								type="radio"
-								name="isDriver"
-								id="driver"
+								name="isClient"
+								id="client"
 								value="true"
-								checked={props.formData.isDriver === true}
+								checked={props.formData.isClient === true}
 								onChange={handleChange}
-								className="mr-2"
+								className="mr-2 text-blue-600 focus:ring-blue-500"
 							/>
-							Sí
+							Cliente
 						</label>
 						<label className="flex items-center">
 							<input
 								type="radio"
-								name="isDriver"
-								id="passenger"
+								name="isClient"
+								id="provider"
 								value="false"
-								checked={props.formData.isDriver === false || props.formData.isDriver === undefined}
+								checked={props.formData.isClient === false || props.formData.isClient === undefined}
 								onChange={handleChange}
-								className="mr-2"
+								className="mr-2 text-blue-600 focus:ring-blue-500"
 							/>
-							No
+							Proveedor
 						</label>
 					</div>
 				</div>
+
+				{!props.formData.isClient && (
+					<div>
+						<label htmlFor="services" className="block mb-2 text-gray-700 font-medium text-sm">
+							Descripción de servicios
+						</label>
+						<textarea
+							name="descripcion"
+							id="descripcion"
+							placeholder="Describe los servicios que ofreces..."
+							className="w-full py-3 px-4 border-2 border-gray-200 rounded-lg text-base transition-all duration-300 bg-gray-50 focus:outline-none focus:border-blue-500 focus:bg-white min-h-20 resize-y"
+							required
+						/>
+					</div>
+				)}
+
 				<button
-					id="registerSubmit"
-					className="w-full bg-primary text-white font-bold py-3 px-4 rounded-full hover:bg-primary-dark transition-colors"
-					type="submit"
+					type="button"
+					onClick={handleSubmit}
+					className="w-full py-3.5 bg-blue-500 text-white border-none rounded-lg text-base font-semibold cursor-pointer transition-all duration-300 mt-3 hover:bg-blue-600"
 				>
 					Registrarse
 				</button>
-			</form>
-		</section>
+			</div>
+		</div>
 	);
-}
+};

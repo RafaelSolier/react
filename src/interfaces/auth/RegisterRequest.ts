@@ -1,12 +1,10 @@
-import { VehicleResponse } from "@interfaces/vehicle/VehicleResponse";
 
 export interface RegisterRequest {
-    isDriver: boolean;
-    firstName: string;
-    lastName: string;
+    nombre: string;
+    apellido?: string;
     email: string;
     password: string;
-    phone: string;
-    category?: string; 
-    vehicle?: VehicleResponse
+    telefono: string;
+    foto: string;
+    descripcion?: string;
 }
