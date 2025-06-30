@@ -4,12 +4,14 @@ import { Plus } from 'lucide-react';
 import ServiciosTable from "@components/servicios/ServiciosTable";
 import { ServicioResponse } from "@interfaces/servicio/ServicioResponse";
 import { useAuthContext } from "@contexts/AuthContext";
+import {Navbar} from "@components/Navbar";
 import {
     obtenerServiciosProveedor,
     eliminarServicio,
     cambiarEstadoServicio
 } from "@services/servicio/servicioService";
 import { obtenerResenasPorServicio } from "@services/resena/resenaService";
+import Footer from '@components/Footer';
 
 const ServiciosPage: React.FC = () => {
     const [servicios, setServicios] = useState<ServicioResponse[]>([]);
@@ -96,6 +98,7 @@ const ServiciosPage: React.FC = () => {
     return (
         <div className="min-h-screen bg-gray-50">
             {/* Header */}
+            <Navbar avatarUrl="https://example.com/avatar.png" userName="Usuario" />
             <div className="bg-white shadow-sm">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="flex justify-between items-center py-6">
@@ -124,6 +127,9 @@ const ServiciosPage: React.FC = () => {
                     onToggleStatus={handleToggleStatus}
                 />
             </div>
+            {/* Footer */}
+            <Footer/>
+            
         </div>
     );
 };
