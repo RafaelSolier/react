@@ -3,12 +3,12 @@ import { RegisterRequest } from "@interfaces/auth/RegisterRequest";
 import { AuthResponse } from "@interfaces/auth/AuthResponse";
 
 export async function registerCliente(
-  registerRequest: RegisterRequest
+    registerRequest: RegisterRequest
 ): Promise<AuthResponse> {
   const Apis = await Api.getInstance();
   const response = await Apis.post<RegisterRequest, AuthResponse>(
-    registerRequest,
-    { url: "/auth/register/cliente" }
+      registerRequest,
+      { url: "/auth/register/cliente" }
   );
   // Set authorization token for subsequent requests
   if (response.data.token) {

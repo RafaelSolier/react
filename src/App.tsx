@@ -1,15 +1,11 @@
 import Navbar from "@components/Navbar";
 import { Outlet } from "react-router-dom";
-import {PhotoUpload} from "@components/auth/PhotoUpload.tsx";
-import {RegisterForm} from "@components/auth/RegisterForm.tsx";
-import AuthPage from "@pages/AuthPage.tsx";
 
 export default function App() {
 	return (
-		<>
-
+		<div className="min-h-screen bg-gray-50">
 			<Navbar />
 			<Outlet />
-		</>
+		</div>
 	);
 }

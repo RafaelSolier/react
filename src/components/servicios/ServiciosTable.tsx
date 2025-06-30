@@ -1,8 +1,9 @@
+
 import React from 'react';
 import ServiciosTableHeader from './ServiciosTableHeader';
 import ServicioRow from './ServicioRow';
 import EmptyTableMessage from './EmptyTableMessage';
-import {ServicioResponse} from "@interfaces/servicio/ServicioResponse.ts";
+import { ServicioResponse } from "@interfaces/servicio/ServicioResponse";
 
 interface ServiciosTableProps {
     servicios: ServicioResponse[];
@@ -10,6 +11,7 @@ interface ServiciosTableProps {
     onDelete: (id: number) => void;
     onViewSchedule: (id: number) => void;
     onViewReviews: (id: number) => void;
+    onToggleStatus: (id: number, currentStatus: boolean) => void;
 }
 
 const ServiciosTable: React.FC<ServiciosTableProps> = ({
@@ -17,7 +19,8 @@ const ServiciosTable: React.FC<ServiciosTableProps> = ({
                                                            onEdit,
                                                            onDelete,
                                                            onViewSchedule,
-                                                           onViewReviews
+                                                           onViewReviews,
+                                                           onToggleStatus
                                                        }) => {
     return (
         <div className="bg-white rounded-lg shadow-sm overflow-hidden">
@@ -32,6 +35,7 @@ const ServiciosTable: React.FC<ServiciosTableProps> = ({
                         onDelete={onDelete}
                         onViewSchedule={onViewSchedule}
                         onViewReviews={onViewReviews}
+                        onToggleStatus={onToggleStatus}
                     />
                 ))}
                 </tbody>

@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
-import {TabNavigation} from "@components/TabNavigation.tsx";
-import {RegisterRequest} from "@interfaces/auth/RegisterRequest.ts";
-import RegisterForm from "@components/auth/RegisterForm.tsx";
-import LoginForm from "@components/auth/LoginForm.tsx";
+import { TabNavigation } from "@components/TabNavigation";
+import { RegisterRequest } from "@interfaces/auth/RegisterRequest";
+import RegisterForm from "@components/auth/RegisterForm";
+import LoginForm from "@components/auth/LoginForm";
 
 const AuthPage: React.FC = () => {
     const [activeTab, setActiveTab] = useState<string>('login');
-    const [formData, setFormData] = useState<RegisterRequest & { isClient: boolean}>({
+    const [formData, setFormData] = useState<RegisterRequest & { isClient: boolean }>({
         nombre: "",
         apellido: "",
         email: "",

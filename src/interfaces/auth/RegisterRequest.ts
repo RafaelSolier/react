@@ -5,6 +5,6 @@ export interface RegisterRequest {
     email: string;
     password: string;
     telefono: string;
-    foto: string;
+    foto?: string;
     descripcion?: string;
 }

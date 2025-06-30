@@ -5,7 +5,7 @@ import Api from "@services/api";
 import { login } from "@services/auth/login";
 import { registerCliente, registerProveedor } from "@services/auth/register";
 import { createContext, ReactNode, useContext, useEffect } from "react";
-import {AuthResponse} from "@interfaces/auth/AuthResponse.ts";
+import { AuthResponse } from "@interfaces/auth/AuthResponse";
 
 interface AuthContextType {
 	register: (SignupRequest: RegisterRequest, isClient: boolean) => Promise<void>;
@@ -13,6 +13,7 @@ interface AuthContextType {
 	logout: () => void;
 	session?: string | null;
 	isLoading: boolean;
+	userId?: number | null;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -20,16 +21,18 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 async function loginHandler(
 	loginRequest: LoginRequest,
 	setSession: (value: string) => void,
+	setUserId: (value: string) => void
 ) {
 	const response = await login(loginRequest);
 	setSession(response.token);
+	setUserId(response.id.toString());
 }
 
 async function signupHandler(
 	signupRequest: RegisterRequest,
 	isClient: boolean,
 	setSession: (value: string) => void,
-
+	setUserId: (value: string) => void
 ) {
 	let response: AuthResponse;
 
@@ -40,31 +43,35 @@ async function signupHandler(
 	}
 
 	setSession(response.token);
+	setUserId(response.id.toString());
 }
 
 export function AuthProvider(props: { children: ReactNode }) {
-        const [[isLoading, session], setSession] = useStorageState("token");
+	const [[isLoading, session], setSession] = useStorageState("token");
+	const [[, userId], setUserId] = useStorageState("userId");
 
-        // Synchronize API authorization header whenever the session changes
-        useEffect(() => {
-                Api.getInstance().then((api) => {
-						api.authorization = session ?? "";
-                });
-        }, [session]);
+	// Synchronize API authorization header whenever the session changes
+	useEffect(() => {
+		Api.getInstance().then((api) => {
+			api.authorization = session ?? "";
+		});
+	}, [session]);
 
 	return (
 		<AuthContext.Provider
 			value={{
-				register: (signupRequest, isClient) => signupHandler(signupRequest, isClient,setSession),
-				login: (loginRequest) => loginHandler(loginRequest, setSession),
-                                logout: () => {
-                                        setSession(null);
-                                        Api.getInstance().then((api) => {
-												api.authorization = "";
-                                        });
-                                },
+				register: (signupRequest, isClient) => signupHandler(signupRequest, isClient, setSession, setUserId),
+				login: (loginRequest) => loginHandler(loginRequest, setSession, setUserId),
+				logout: () => {
+					setSession(null);
+					setUserId(null);
+					Api.getInstance().then((api) => {
+						api.authorization = "";
+					});
+				},
 				session,
 				isLoading,
+				userId: userId ? parseInt(userId) : null,
 			}}
 		>
 			{props.children}

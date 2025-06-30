@@ -1,48 +1,32 @@
-// src/pages/MisServiciosPage.tsx
+// src/pages/ServiciosPage.tsx
 import React, { useState, useEffect } from 'react';
-import { Plus,} from 'lucide-react';
-import ServiciosTable from "@components/servicios/ServiciosTable.tsx";
-import {ServicioResponse} from "@interfaces/servicio/ServicioResponse.ts";
+import { Plus } from 'lucide-react';
+import ServiciosTable from "@components/servicios/ServiciosTable";
+import { ServicioResponse } from "@interfaces/servicio/ServicioResponse";
+import { useAuthContext } from "@contexts/AuthContext";
+import {
+    obtenerServiciosProveedor,
+    eliminarServicio,
+    cambiarEstadoServicio
+} from "@services/servicio/servicioService";
+import { obtenerResenasPorServicio } from "@services/resena/resenaService";
 
-const MisServiciosPage: React.FC = () => {
+const ServiciosPage: React.FC = () => {
     const [servicios, setServicios] = useState<ServicioResponse[]>([]);
     const [loading, setLoading] = useState(true);
+    const { userId } = useAuthContext();
 
     useEffect(() => {
         fetchServicios();
-    }, []);
+    }, [userId]);
 
     const fetchServicios = async () => {
         try {
-            // Simulamos datos
-            const mockServicios: ServicioResponse[] = [
-                {
-                    id: 1,
-                    nombre: "Desarrollo de Apps",
-                    descripcion: "Desarrollo de aplicaciones móviles para Android e iOS",
-                    precio: 300,
-                    categoria: "TECNOLOGIA",
-                    activo: true,
-                    proveedorId: 1,
-                },
-                {
-                    id: 2,
-                    nombre: "Consultoría SEO",
-                    descripcion: "Optimización de sitios web para motores de búsqueda",
-                    precio: 150,
-                    categoria: "MARKETING",
-                    activo: false,
-                    proveedorId: 1,
-                }
-            ];
-
-            setServicios(mockServicios);
+            if (userId) {
+                const data = await obtenerServiciosProveedor(userId);
+                setServicios(data);
+            }
             setLoading(false);
-
-            // TODO: Implementar llamada real al API
-            // const Api = await Api.getInstance();
-            // const response = await Api.get("/proveedores/{id}/servicios");
-            // setServicios(response.data);
         } catch (error) {
             console.error("Error al cargar servicios:", error);
             setLoading(false);
@@ -51,17 +35,14 @@ const MisServiciosPage: React.FC = () => {
 
     const handleEdit = (id: number) => {
         console.log('Editar servicio:', id);
-        // TODO: Implementar navegación a página de edición
+        // TODO: Implementar navegación a página de edición o modal
     };
 
     const handleDelete = async (id: number) => {
         if (window.confirm("¿Estás seguro de que deseas eliminar este servicio?")) {
             try {
-                // TODO: Implementar eliminación real
-                // const Api = await Api.getInstance();
-                // await Api.delete(`/servicios/${id}`);
-
-                // Simulamos la eliminación
+                await eliminarServicio(id);
+                // Actualizar la lista local
                 setServicios(servicios.filter(s => s.id !== id));
                 alert("Servicio eliminado exitosamente");
             } catch (error) {
@@ -73,19 +54,36 @@ const MisServiciosPage: React.FC = () => {
 
     const handleViewSchedule = (id: number) => {
         console.log('Ver horarios del servicio:', id);
-        // TODO: Implementar navegación o modal
+        // TODO: Implementar navegación o modal para ver horarios
     };
 
-    const handleViewReviews = (id: number) => {
-        console.log('Ver reseñas del servicio:', id);
-        // TODO: Implementar navegación o modal
+    const handleViewReviews = async (id: number) => {
+        try {
+            const resenas = await obtenerResenasPorServicio(id);
+            console.log('Reseñas del servicio:', resenas);
+            // TODO: Mostrar reseñas en un modal o navegación
+        } catch (error) {
+            console.error("Error al obtener reseñas:", error);
+        }
     };
 
     const handleNewService = () => {
         console.log('Crear nuevo servicio');
-        // TODO: Implementar navegación o modal
+        // TODO: Implementar navegación o modal para crear servicio
     };
 
+    const handleToggleStatus = async (id: number, currentStatus: boolean) => {
+        try {
+            await cambiarEstadoServicio(id, !currentStatus);
+            // Actualizar el estado local
+            setServicios(servicios.map(s =>
+                s.id === id ? { ...s, activo: !currentStatus } : s
+            ));
+        } catch (error) {
+            console.error("Error al cambiar estado del servicio:", error);
+            alert("Error al cambiar el estado del servicio");
+        }
+    };
 
     if (loading) {
         return (
@@ -117,13 +115,17 @@ const MisServiciosPage: React.FC = () => {
 
             {/* Content */}
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-                <ServiciosTable servicios={servicios} onEdit={handleEdit}
-                                                    onDelete={handleDelete}
-                                                    onViewSchedule={handleViewSchedule}
-                                                    onViewReviews={handleViewReviews} />
+                <ServiciosTable
+                    servicios={servicios}
+                    onEdit={handleEdit}
+                    onDelete={handleDelete}
+                    onViewSchedule={handleViewSchedule}
+                    onViewReviews={handleViewReviews}
+                    onToggleStatus={handleToggleStatus}
+                />
             </div>
         </div>
     );
 };
 
-export default MisServiciosPage;
+export default ServiciosPage;

@@ -1,15 +1,16 @@
-import { RegisterRequest } from "@interfaces/auth/RegisterRequest.ts";
+import { RegisterRequest } from "@interfaces/auth/RegisterRequest";
 import { ChangeEvent, FormEvent, Dispatch, SetStateAction, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useAuthContext } from "@contexts/AuthContext.tsx";
-import {PhotoUpload} from "@components/auth/PhotoUpload.tsx";
+import { useAuthContext } from "@contexts/AuthContext";
+import { PhotoUpload } from "@components/auth/PhotoUpload";
+import { getRoleBasedOnToken } from "../../utils/getRoleBasedOnToken";
 
 interface RegisterFormProps {
 	formData: RegisterRequest & { isClient: boolean };
-	setFormData: Dispatch<SetStateAction<RegisterRequest & { isClient: boolean}>>;
+	setFormData: Dispatch<SetStateAction<RegisterRequest & { isClient: boolean }>>;
 }
 
-export default function RegisterForm (props: RegisterFormProps){
+export default function RegisterForm(props: RegisterFormProps) {
 	const [confirmPassword, setConfirmPassword] = useState<string>("");
 	const navigate = useNavigate();
 	const { register } = useAuthContext();
@@ -31,10 +32,22 @@ export default function RegisterForm (props: RegisterFormProps){
 	}
 
 	const handlePhotoChange = (file: File | null) => {
-		props.setFormData(prev => ({
-			...prev,
-			photo: file
-		}));
+		if (file) {
+			// Convert file to base64 string
+			const reader = new FileReader();
+			reader.onloadend = () => {
+				props.setFormData(prev => ({
+					...prev,
+					foto: reader.result as string
+				}));
+			};
+			reader.readAsDataURL(file);
+		} else {
+			props.setFormData(prev => ({
+				...prev,
+				foto: undefined
+			}));
+		}
 	};
 
 	async function handleSubmit(e: FormEvent) {
@@ -47,9 +60,19 @@ export default function RegisterForm (props: RegisterFormProps){
 
 		try {
 			await register(props.formData, props.formData.isClient);
-			navigate("/dasboard")
-		}catch (error: any) {
+
+			// Después del registro, verificar el rol y redirigir
+			setTimeout(() => {
+				const role = getRoleBasedOnToken();
+				if (role === "ROLE_PROVEEDOR") {
+					navigate("/servicios");
+				} else {
+					navigate("/dashboard"); // Para clientes
+				}
+			}, 100);
+		} catch (error: any) {
 			console.error("Error al registrar:", error);
+			alert(error.response?.data?.message || "Error al registrar");
 		}
 	}
 
@@ -58,10 +81,10 @@ export default function RegisterForm (props: RegisterFormProps){
 			<h2 className="text-gray-900 mb-8 text-2xl font-semibold">
 				Crear una cuenta
 			</h2>
-			<div className="space-y-5">
+			<form onSubmit={handleSubmit} className="space-y-5">
 				<div className="flex gap-4">
 					<div className="flex-1">
-						<label htmlFor="firstName" className="block mb-2 text-gray-700 font-medium text-sm">
+						<label htmlFor="nombre" className="block mb-2 text-gray-700 font-medium text-sm">
 							Nombre
 						</label>
 						<input
@@ -76,7 +99,7 @@ export default function RegisterForm (props: RegisterFormProps){
 						/>
 					</div>
 					<div className="flex-1">
-						<label htmlFor="lastName" className="block mb-2 text-gray-700 font-medium text-sm">
+						<label htmlFor="apellido" className="block mb-2 text-gray-700 font-medium text-sm">
 							Apellidos
 						</label>
 						<input
@@ -87,7 +110,6 @@ export default function RegisterForm (props: RegisterFormProps){
 							onChange={handleChange}
 							placeholder="Tus apellidos"
 							className="w-full py-3 px-4 border-2 border-gray-200 rounded-lg text-base transition-all duration-300 bg-gray-50 focus:outline-none focus:border-blue-500 focus:bg-white"
-							required
 						/>
 					</div>
 				</div>
@@ -109,7 +131,7 @@ export default function RegisterForm (props: RegisterFormProps){
 				</div>
 
 				<div>
-					<label htmlFor="phone" className="block mb-2 text-gray-700 font-medium text-sm">
+					<label htmlFor="telefono" className="block mb-2 text-gray-700 font-medium text-sm">
 						Celular
 					</label>
 					<input
@@ -179,7 +201,7 @@ export default function RegisterForm (props: RegisterFormProps){
 								name="isClient"
 								id="provider"
 								value="false"
-								checked={props.formData.isClient === false || props.formData.isClient === undefined}
+								checked={props.formData.isClient === false}
 								onChange={handleChange}
 								className="mr-2 text-blue-600 focus:ring-blue-500"
 							/>
@@ -190,27 +212,27 @@ export default function RegisterForm (props: RegisterFormProps){
 
 				{!props.formData.isClient && (
 					<div>
-						<label htmlFor="services" className="block mb-2 text-gray-700 font-medium text-sm">
+						<label htmlFor="descripcion" className="block mb-2 text-gray-700 font-medium text-sm">
 							Descripción de servicios
 						</label>
 						<textarea
 							name="descripcion"
 							id="descripcion"
+							value={props.formData.descripcion || ""}
+							onChange={handleChange}
 							placeholder="Describe los servicios que ofreces..."
 							className="w-full py-3 px-4 border-2 border-gray-200 rounded-lg text-base transition-all duration-300 bg-gray-50 focus:outline-none focus:border-blue-500 focus:bg-white min-h-20 resize-y"
-							required
 						/>
 					</div>
 				)}
 
 				<button
-					type="button"
-					onClick={handleSubmit}
+					type="submit"
 					className="w-full py-3.5 bg-blue-500 text-white border-none rounded-lg text-base font-semibold cursor-pointer transition-all duration-300 mt-3 hover:bg-blue-600"
 				>
 					Registrarse
 				</button>
-			</div>
+			</form>
 		</div>
 	);
-};
+}

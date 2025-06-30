@@ -1,9 +1,10 @@
-import { LoginRequest } from "@interfaces/auth/LoginRequest.ts";
+import { LoginRequest } from "@interfaces/auth/LoginRequest";
 import { ChangeEvent, FormEvent, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useAuthContext } from "@contexts/AuthContext.tsx";
+import { useAuthContext } from "@contexts/AuthContext";
+import { getRoleBasedOnToken } from "../../utils/getRoleBasedOnToken";
 
-export default function LoginForm () {
+export default function LoginForm() {
 	const [formData, setFormData] = useState<LoginRequest>({
 		email: "",
 		password: ""
@@ -14,10 +15,10 @@ export default function LoginForm () {
 	const { login } = useAuthContext();
 
 	function handleChange(e: ChangeEvent<HTMLInputElement>) {
-		const { name, value, type, checked } = e.target;
+		const { name, value } = e.target;
 		setFormData(prev => ({
 			...prev,
-			[name]: type === 'checkbox' ? checked : value
+			[name]: value
 		}));
 	}
 
@@ -29,8 +30,17 @@ export default function LoginForm () {
 		try {
 			await login(formData);
 			setSuccessMessage("Login exitoso!");
+
+			// Verificar el rol y redirigir
 			setTimeout(() => {
-				navigate("/dashboard");
+				const role = getRoleBasedOnToken();
+				if (role === "ROLE_PROVEEDOR") {
+					navigate("/servicios");
+				} else if (role === "ROLE_CLIENTE") {
+					navigate("/dashboard");
+				} else {
+					navigate("/");
+				}
 			}, 500);
 		} catch (error: any) {
 			setError(error.response?.data?.message || "Error al iniciar sesión");
@@ -42,7 +52,7 @@ export default function LoginForm () {
 			<h2 className="text-gray-900 mb-8 text-2xl font-semibold">
 				Bienvenido a ServiMatch
 			</h2>
-			<div className="space-y-5">
+			<form onSubmit={handleSubmit} className="space-y-5">
 				<div>
 					<label htmlFor="email" className="block mb-2 text-gray-700 font-medium text-sm">
 						Correo electrónico
@@ -75,10 +85,8 @@ export default function LoginForm () {
 					/>
 				</div>
 
-
 				<button
-					type="button"
-					onClick={handleSubmit}
+					type="submit"
 					className="w-full py-3.5 bg-blue-500 text-white border-none rounded-lg text-base font-semibold cursor-pointer transition-all duration-300 mt-3 hover:bg-blue-600"
 				>
 					Iniciar Sesión
@@ -94,7 +102,7 @@ export default function LoginForm () {
 						{successMessage}
 					</div>
 				)}
-			</div>
+			</form>
 		</div>
 	);
-};
+}

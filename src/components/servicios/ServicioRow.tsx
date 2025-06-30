@@ -1,8 +1,8 @@
 
 import React from 'react';
 import CategoriaBadge from './CategoriaBadge';
-import {ServicioResponse} from "@interfaces/servicio/ServicioResponse.ts";
-import { Edit2, Clock, Star, Trash2 } from 'lucide-react';
+import { ServicioResponse } from "@interfaces/servicio/ServicioResponse";
+import { Edit2, Clock, Star, Trash2, ToggleLeft, ToggleRight } from 'lucide-react';
 
 interface ServicioRowProps {
     servicio: ServicioResponse;
@@ -10,6 +10,7 @@ interface ServicioRowProps {
     onDelete: (id: number) => void;
     onViewSchedule: (id: number) => void;
     onViewReviews: (id: number) => void;
+    onToggleStatus: (id: number, currentStatus: boolean) => void;
 }
 
 const ServicioRow: React.FC<ServicioRowProps> = ({
@@ -17,7 +18,8 @@ const ServicioRow: React.FC<ServicioRowProps> = ({
                                                      onEdit,
                                                      onDelete,
                                                      onViewSchedule,
-                                                     onViewReviews
+                                                     onViewReviews,
+                                                     onToggleStatus
                                                  }) => {
     return (
         <tr key={servicio.id} className="hover:bg-gray-50 transition-colors">
@@ -33,20 +35,33 @@ const ServicioRow: React.FC<ServicioRowProps> = ({
             </td>
             <td className="px-6 py-4 whitespace-nowrap">
                 <div className="text-sm font-medium text-gray-900">
-                    ${servicio.precio}
+                    S/. {servicio.precio.toFixed(2)}
                 </div>
             </td>
             <td className="px-6 py-4 whitespace-nowrap">
                 <CategoriaBadge categoria={servicio.categoria} />
             </td>
             <td className="px-6 py-4 whitespace-nowrap">
-                <span className={`text-sm font-semibold ${
-                    servicio.activo
-                        ? 'text-green-600'
-                        : 'text-gray-500'
-                }`}>
-                    {servicio.activo ? 'Activo' : 'Inactivo'}
-                </span>
+                <button
+                    onClick={() => onToggleStatus(servicio.id, servicio.activo)}
+                    className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium transition-colors ${
+                        servicio.activo
+                            ? 'bg-green-100 text-green-800 hover:bg-green-200'
+                            : 'bg-gray-100 text-gray-800 hover:bg-gray-200'
+                    }`}
+                >
+                    {servicio.activo ? (
+                        <>
+                            <ToggleRight className="h-4 w-4 mr-1" />
+                            Activo
+                        </>
+                    ) : (
+                        <>
+                            <ToggleLeft className="h-4 w-4 mr-1" />
+                            Inactivo
+                        </>
+                    )}
+                </button>
             </td>
 
             <td className="px-6 py-4 whitespace-nowrap">

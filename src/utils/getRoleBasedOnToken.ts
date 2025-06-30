@@ -1,13 +1,24 @@
 import { jwtDecode } from "jwt-decode";
 
 interface DecodedToken {
-	role: string;
+	roles: string[];
+	sub: string;
+	exp: number;
 }
 
-export function getRoleBasedOnToken() {
+export function getRoleBasedOnToken(): string | null {
 	const token = localStorage.getItem("token");
-	if (!token) throw new Error("Token not found");
-	const decodedToken = jwtDecode<DecodedToken>(token);
-	// console.log("Decoded Token:", decodedToken);
-	return decodedToken.role;
+	if (!token) return null;
+
+	try {
+		const decodedToken = jwtDecode<DecodedToken>(token);
+		// El backend envía los roles en un array
+		if (decodedToken.roles && decodedToken.roles.length > 0) {
+			return decodedToken.roles[0];
+		}
+		return null;
+	} catch (error) {
+		console.error("Error decoding token:", error);
+		return null;
+	}
 }
