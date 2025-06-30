@@ -2,20 +2,17 @@ import { createBrowserRouter, Navigate, Outlet } from "react-router-dom";
 import App from "src/App";
 import { ProtectedRoute } from "./ProtectedRoute";
 import { useAuthContext } from "@contexts/AuthContext";
-import LoginPage from "src/pages/LoginPage";
-import RegisterPage from "src/pages/RegisterPage";
-import Dashboard from "src/pages/DashboardPage";
-import ProfileEdit from "src/pages/EditProfilePage";
-import VehicleEdit from "src/pages/EditVehiclePage";
-import NotFound from "src/pages/NotFoundPage";
+import AuthPage from "@pages/AuthPage";
+import ServiciosPage from "@pages/ServiciosPage";
+import NotFound from "@pages/NotFoundPage";
 
-// (Opcional) para rutas públicas que no deje entrar a quien ya esté logueado
+// Para rutas públicas que no deje entrar a quien ya esté logueado
 function PublicRoute({ children }: { children: JSX.Element }) {
   const { session, isLoading } = useAuthContext();
   if (isLoading) return null;
   return session
-    ? <Navigate to="/dashboard" replace />
-    : children;
+      ? <Navigate to="/servicios" replace />
+      : children;
 }
 
 export const router = createBrowserRouter([
@@ -30,13 +27,12 @@ export const router = createBrowserRouter([
       {
         path: "auth",
         element: (
-          <PublicRoute>
-            <Outlet />
-          </PublicRoute>
+            <PublicRoute>
+              <Outlet />
+            </PublicRoute>
         ),
         children: [
-          { path: "login", element: <LoginPage /> },
-          { path: "register", element: <RegisterPage /> },
+          { path: "login", element: <AuthPage /> },
         ],
       },
 
@@ -45,9 +41,8 @@ export const router = createBrowserRouter([
         path: "/",
         element: <ProtectedRoute />,
         children: [
-          { path: "dashboard", element: <Dashboard /> },
-          { path: "profile/edit", element: <ProfileEdit /> },
-          { path: "vehicle/edit", element: <VehicleEdit /> },
+          { path: "servicios", element: <ServiciosPage /> },
+          { path: "reservas", element: <div>Mis Reservas</div> }, // TODO: Implementar
         ],
       },
 
@@ -56,4 +51,3 @@ export const router = createBrowserRouter([
     ],
   },
 ]);
-

@@ -1,6 +1,6 @@
-import img4 from "@assets/Img4.jpg";
+
 import Button from "@components/Button";
-import LoginForm from "@components/LoginForm";
+import LoginForm from "@components/auth/LoginForm.tsx";
 
 export default function LoginPage() {
 	return (
@@ -15,7 +15,6 @@ export default function LoginPage() {
 				<section className="login-section flex flex-col items-center p-4 text-center">
 					<h2 className="title">Bienvenido de vuelta</h2>
 					<p>Inicia sesión para empezar a usar Uber</p>
-					<img src={img4} alt="uber" />
 				</section>
 			</article>
 		</main>
