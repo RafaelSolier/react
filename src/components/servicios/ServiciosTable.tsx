@@ -23,6 +23,7 @@ const ServiciosTable: React.FC<ServiciosTableProps> = ({
                                                            onToggleStatus
                                                        }) => {
     return (
+  
         <div className="bg-white rounded-lg shadow-sm overflow-hidden">
             <table className="min-w-full">
                 <ServiciosTableHeader />
