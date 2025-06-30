@@ -1,8 +1,8 @@
-import { RegisterRequest } from "@interfaces/auth/RegisterRequest";
+import { RegisterRequest } from "@interfaces/auth/RegisterRequest.ts";
 import { ChangeEvent, FormEvent, Dispatch, SetStateAction, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useAuthContext } from "@contexts/AuthContext";
-import {PhotoUpload} from "@components/PhotoUpload.tsx";
+import { useAuthContext } from "@contexts/AuthContext.tsx";
+import {PhotoUpload} from "@components/auth/PhotoUpload.tsx";
 
 interface RegisterFormProps {
 	formData: RegisterRequest & { isClient: boolean };

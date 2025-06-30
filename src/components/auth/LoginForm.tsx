@@ -1,7 +1,7 @@
-import { LoginRequest } from "@interfaces/auth/LoginRequest";
+import { LoginRequest } from "@interfaces/auth/LoginRequest.ts";
 import { ChangeEvent, FormEvent, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useAuthContext } from "@contexts/AuthContext";
+import { useAuthContext } from "@contexts/AuthContext.tsx";
 
 export default function LoginForm () {
 	const [formData, setFormData] = useState<LoginRequest>({

@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import {TabNavigation} from "@components/TabNavigation.tsx";
 import {RegisterRequest} from "@interfaces/auth/RegisterRequest.ts";
-import RegisterForm from "@components/RegisterForm.tsx";
-import LoginForm from "@components/LoginForm.tsx";
+import RegisterForm from "@components/auth/RegisterForm.tsx";
+import LoginForm from "@components/auth/LoginForm.tsx";
 
 const AuthPage: React.FC = () => {
     const [activeTab, setActiveTab] = useState<string>('login');

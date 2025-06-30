@@ -2,9 +2,9 @@ import { createBrowserRouter, Navigate, Outlet } from "react-router-dom";
 import App from "src/App";
 import { ProtectedRoute } from "./ProtectedRoute";
 import { useAuthContext } from "@contexts/AuthContext";
-import LoginPage from "src/pages/LoginPage";
 import ProfileEdit from "src/pages/EditProfilePage";
 import NotFound from "src/pages/NotFoundPage";
+import MisServiciosPage from "@pages/ServiciosPage.tsx";
 
 // (Opcional) para rutas públicas que no deje entrar a quien ya esté logueado
 function PublicRoute({ children }: { children: JSX.Element }) {
@@ -32,7 +32,7 @@ export const router = createBrowserRouter([
           </PublicRoute>
         ),
         children: [
-          { path: "login", element: <LoginPage /> },
+          { path: "login", element: <MisServiciosPage /> },
         ],
       },
 
