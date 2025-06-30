@@ -41,18 +41,14 @@ const ServicioRow: React.FC<ServicioRowProps> = ({
             </td>
             <td className="px-6 py-4 whitespace-nowrap">
                 <span className={`text-sm font-semibold ${
-                    servicio.estado === 'ACTIVO' || !servicio.estado
+                    servicio.activo
                         ? 'text-green-600'
                         : 'text-gray-500'
                 }`}>
-                    {servicio.estado === 'ACTIVO' || !servicio.estado ? 'Activo' : 'Inactivo'}
+                    {servicio.activo ? 'Activo' : 'Inactivo'}
                 </span>
             </td>
-            <td className="px-6 py-4 whitespace-nowrap text-center">
-        <span className="text-sm text-gray-900 font-medium">
-          {servicio.cantidadReservas || 0}
-        </span>
-            </td>
+
             <td className="px-6 py-4 whitespace-nowrap">
                 <div className="flex items-center justify-center space-x-3">
                     <button

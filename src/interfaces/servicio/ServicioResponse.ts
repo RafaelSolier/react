@@ -5,6 +5,5 @@ export interface ServicioResponse {
     precio: number;
     categoria: string; // "LIMPIEZA" | "PLOMERIA" | "ELECTRICISTA" | "CARPINTERIA" | "PINTURA" | "JARDINERIA" | "CUIDADOS" | "TECNOLOGIA" | "MARKETING";
     proveedorId: number;
-    estado?: "ACTIVO" | "INACTIVO";
-    cantidadReservas?: number;
+    activo: boolean;
 }

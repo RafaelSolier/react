@@ -18,9 +18,6 @@ const ServiciosTableHeader: React.FC = () => {
                 ESTADO
             </th>
             <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
-                RESERVAS
-            </th>
-            <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
                 ACCIONES
             </th>
         </tr>

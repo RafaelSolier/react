@@ -2,16 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { Plus,} from 'lucide-react';
 import ServiciosTable from "@components/servicios/ServiciosTable.tsx";
-
-interface ServicioResponse {
-    id: number;
-    nombre: string;
-    descripcion: string;
-    precio: number;
-    categoria: string;
-    estado?: "ACTIVO" | "INACTIVO";
-    cantidadReservas?: number;
-}
+import {ServicioResponse} from "@interfaces/servicio/ServicioResponse.ts";
 
 const MisServiciosPage: React.FC = () => {
     const [servicios, setServicios] = useState<ServicioResponse[]>([]);
@@ -31,8 +22,8 @@ const MisServiciosPage: React.FC = () => {
                     descripcion: "Desarrollo de aplicaciones móviles para Android e iOS",
                     precio: 300,
                     categoria: "TECNOLOGIA",
-                    estado: "ACTIVO",
-                    cantidadReservas: 12
+                    activo: true,
+                    proveedorId: 1,
                 },
                 {
                     id: 2,
@@ -40,8 +31,8 @@ const MisServiciosPage: React.FC = () => {
                     descripcion: "Optimización de sitios web para motores de búsqueda",
                     precio: 150,
                     categoria: "MARKETING",
-                    estado: "ACTIVO",
-                    cantidadReservas: 8
+                    activo: false,
+                    proveedorId: 1,
                 }
             ];
 
@@ -95,30 +86,6 @@ const MisServiciosPage: React.FC = () => {
         // TODO: Implementar navegación o modal
     };
 
-    const getCategoriaStyles = (categoria: string) => {
-        switch (categoria.toUpperCase()) {
-            case 'TECNOLOGIA':
-                return 'bg-purple-100 text-purple-800';
-            case 'MARKETING':
-                return 'bg-blue-100 text-blue-800';
-            case 'LIMPIEZA':
-                return 'bg-green-100 text-green-800';
-            case 'PLOMERIA':
-                return 'bg-yellow-100 text-yellow-800';
-            case 'ELECTRICISTA':
-                return 'bg-orange-100 text-orange-800';
-            case 'CARPINTERIA':
-                return 'bg-amber-100 text-amber-800';
-            case 'PINTURA':
-                return 'bg-pink-100 text-pink-800';
-            case 'JARDINERIA':
-                return 'bg-teal-100 text-teal-800';
-            case 'CUIDADOS':
-                return 'bg-indigo-100 text-indigo-800';
-            default:
-                return 'bg-gray-100 text-gray-800';
-        }
-    };
 
     if (loading) {
         return (
