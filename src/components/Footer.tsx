@@ -18,15 +18,15 @@ const Footer: React.FC = () => {
                     <h3 className="text-lg font-semibold text-white mb-2">Enlaces Rápidos</h3>
                     <ul className="space-y-1">
                         <li>
-                            <a href="#" className="hover:text-white">
+                            <a href="/servicios" className="hover:text-white">
                                 Inicio
                             </a>
                         </li>
-                        <li>
+                        {/* <li>
                             <a href="#" className="hover:text-white">
                                 Categorías
                             </a>
-                        </li>
+                        </li> */}
                         <li>
                             <a href="#" className="hover:text-white">
                                 Cómo Funciona
@@ -57,7 +57,7 @@ const Footer: React.FC = () => {
             {/* Bottom copyright */}
             <div className="border-t border-gray-700 mt-8 pt-4">
                 <p className="text-center text-sm">
-                    © 2023 ServiMarket. Todos los derechos reservados.
+                    © 2025 ServiMarket. Todos los derechos reservados.
                 </p>
             </div>
         </footer>
