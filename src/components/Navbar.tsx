@@ -1,9 +1,10 @@
 // src/components/Navbar.tsx
 import React from "react";
 import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/react";
-import { Briefcase, ChevronDown } from "lucide-react";
+import { Briefcase, ChevronDown, UserCircle } from "lucide-react";
 import Button from "./Button";
 import { useNavigate, useLocation, Link } from "react-router-dom";
+import {useAuthContext} from "@contexts/AuthContext.tsx";
 
 interface NavbarProps {
   avatarUrl: string;
@@ -20,13 +21,12 @@ export const Navbar: React.FC<NavbarProps> = ({
 }) => {
   const navigate = useNavigate();
   const location = useLocation();
+  const { logout } = useAuthContext();
 
   const handleLogout = () => {
-    // 1. Quitar el token de almacenamiento
-    localStorage.removeItem("token");
     // 2. Avisar al contexto que cerramos sesión
-    onLogout?.();
-    // 3. Redirigir al login, indicando desde dónde veníamos
+    logout(); // Esto ya maneja limpiar el token y el userId
+    onLogout?.(); // Llama al callback opcional si existe
     navigate(`/auth/login?from=${encodeURIComponent(location.pathname)}`, {
       replace: true,
     });
@@ -55,14 +55,7 @@ export const Navbar: React.FC<NavbarProps> = ({
 
           <Menu as="div" className="relative">
             <MenuButton className="flex items-center space-x-2 focus:outline-none focus:ring-2 focus:ring-white focus:ring-opacity-75 rounded-md px-2 py-1">
-              <img
-                src={avatarUrl}
-                alt={`Avatar de ${userName}`}
-                className="w-8 h-8 rounded-full ring-2 ring-white"
-                onError={(e) => {
-                  e.currentTarget.src = '/default-avatar.png';
-                }}
-              />
+              <UserCircle className="w-8 h-8 text-white" /> {/* Ícono en lugar de la imagen */}
               <span className="text-white font-medium">{userName}</span>
               <ChevronDown className="w-4 h-4 text-white" />
             </MenuButton>
