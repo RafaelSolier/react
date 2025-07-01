@@ -5,6 +5,7 @@ import { useAuthContext } from "@contexts/AuthContext";
 import AuthPage from "@pages/AuthPage";
 import ServiciosPage from "@pages/ServiciosPage";
 import NotFound from "@pages/NotFoundPage";
+import EditProfilePage from "@pages/EditProfilePage.tsx";
 import ReservasPage from "@pages/ReservasPage";
 import ServiciosPageCliente from "@pages/ServiciosPageCliente";
 import ReservasPageCliente from "@pages/ReservasPageCliente";
@@ -47,7 +48,8 @@ export const router = createBrowserRouter([
           { path: "servicios", element: <ServiciosPage /> },
           { path: "reservas", element: <ReservasPage /> },
           { path: "serviciosCliente", element: <ServiciosPageCliente /> },
-          { path: "reservasCliente", element: <ReservasPageCliente/> }, // TODO: Implementar
+          { path: "reservasCliente", element: <ReservasPageCliente/> },
+          { path: "perfil", element: <EditProfilePage />}
         ],
       },
 

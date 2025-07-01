@@ -13,17 +13,22 @@ import {
   eliminarServicio,
   cambiarEstadoServicio
 } from "@services/servicio/servicioService";
+
+import { obtenerResenasPorServicio } from "@services/resena/resenaService";
 import Footer from '@components/Footer';
 import { ServiceForm } from '@components/ServiceForm';
 import { crearHorarioDeServicio } from '@services/disponibilidad/horarioService';
 import { HorarioRequest } from '@interfaces/disponibilidades/HorarioRequest';
 import { ServiceScheduleForm } from '@components/HorarioForm';
 import { ServiceReviews } from '@components/ServiceReviews';
+import {getMeInfo} from "@services/auth/me.ts";
+import {AuthMeDto} from "@interfaces/auth/AuthMeDto.ts";
+
 const ServiciosPage: React.FC = () => {
   const { userId } = useAuthContext();
   const [servicios, setServicios] = useState<ServicioResponse[]>([]);
   const [loading, setLoading] = useState(true);
-
+  const [user, setUser] = useState<AuthMeDto>();
   // Create form state
   const [isCreating, setIsCreating] = useState(false);
   const [isLoadingCreate, setIsLoadingCreate] = useState(false);
@@ -43,6 +48,8 @@ const ServiciosPage: React.FC = () => {
   }, [userId]);
 
   const fetchServicios = async () => {
+    const userget = await getMeInfo();
+    setUser(userget);
     try {
       if (userId) {
         const data = await obtenerServiciosProveedor(userId);
@@ -134,7 +141,7 @@ const ServiciosPage: React.FC = () => {
   if (scheduleServicioId === null) return;
   setIsSubmittingSchedule(true);
   try {
-    // UNA SOLA LLAMADA con todo el array
+
     await crearHorarioDeServicio(scheduleServicioId, horarios);
     alert("Horarios guardados correctamente.");
     setScheduleServicioId(null);
@@ -157,7 +164,7 @@ const ServiciosPage: React.FC = () => {
   return (
     <div className="min-h-screen flex flex-col bg-gray-50">
       {/* Header */}
-      <Navbar avatarUrl="#" userName="Usuario" />
+      <Navbar avatarUrl="#" userName={user == null? "User": user.nombre}/>
       <div className="bg-white shadow-sm">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center py-6">
