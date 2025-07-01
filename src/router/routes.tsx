@@ -5,6 +5,7 @@ import { useAuthContext } from "@contexts/AuthContext";
 import AuthPage from "@pages/AuthPage";
 import ServiciosPage from "@pages/ServiciosPage";
 import NotFound from "@pages/NotFoundPage";
+import ReservasPage from "@pages/ReservasPage";
 
 // Para rutas públicas que no deje entrar a quien ya esté logueado
 function PublicRoute({ children }: { children: JSX.Element }) {
@@ -42,7 +43,7 @@ export const router = createBrowserRouter([
         element: <ProtectedRoute />,
         children: [
           { path: "servicios", element: <ServiciosPage /> },
-          { path: "reservas", element: <div>Mis Reservas</div> }, // TODO: Implementar
+          { path: "reservas", element: <ReservasPage /> }, // TODO: Implementar
         ],
       },
 

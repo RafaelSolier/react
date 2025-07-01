@@ -13,13 +13,12 @@ import {
   eliminarServicio,
   cambiarEstadoServicio
 } from "@services/servicio/servicioService";
-import { obtenerResenasPorServicio } from "@services/resena/resenaService";
 import Footer from '@components/Footer';
 import { ServiceForm } from '@components/ServiceForm';
 import { crearHorarioDeServicio } from '@services/disponibilidad/horarioService';
 import { HorarioRequest } from '@interfaces/disponibilidades/HorarioRequest';
 import { ServiceScheduleForm } from '@components/HorarioForm';
-
+import { ServiceReviews } from '@components/ServiceReviews';
 const ServiciosPage: React.FC = () => {
   const { userId } = useAuthContext();
   const [servicios, setServicios] = useState<ServicioResponse[]>([]);
@@ -36,6 +35,8 @@ const ServiciosPage: React.FC = () => {
   // Schedule form state
   const [scheduleServicioId, setScheduleServicioId] = useState<number | null>(null);
   const [isSubmittingSchedule, setIsSubmittingSchedule] = useState(false);
+  //Resenas
+  const [viewingReviewsId, setViewingReviewsId] = useState<number | null>(null);
 
   useEffect(() => {
     fetchServicios();
@@ -112,14 +113,17 @@ const ServiciosPage: React.FC = () => {
     }
   };
 
-  // Reviews
-  const handleViewReviews = async (id: number) => {
-    try {
-      const resenas = await obtenerResenasPorServicio(id);
-      console.log("Reseñas:", resenas);
-    } catch (error) {
-      console.error("Error al obtener reseñas:", error);
-    }
+  // // Reviews
+  // const handleViewReviews = async (id: number) => {
+  //   try {
+  //     const resenas = await obtenerResenasPorServicio(id);
+  //     console.log("Reseñas:", resenas);
+  //   } catch (error) {
+  //     console.error("Error al obtener reseñas:", error);
+  //   }
+  // };
+  const handleViewReviews = (id: number) => {
+  setViewingReviewsId(id);
   };
 
   // Schedule
@@ -206,6 +210,16 @@ const ServiciosPage: React.FC = () => {
         onSubmit={handleScheduleSubmit}
         />
       )}
+
+      {/* Reviews */}
+      {viewingReviewsId !== null && (
+       <div className="mb-8">
+         <ServiceReviews
+           servicioId={viewingReviewsId}
+           onClose={() => setViewingReviewsId(null)}
+         />
+       </div>
+     )}
 
       {/* Services Table */}
       <ServiciosTable

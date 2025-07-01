@@ -9,6 +9,5 @@ export function ProtectedRoute() {
 
 	if (!authContext.session)
 		return <Navigate to={`/auth/login?from=${location.pathname}`} replace />;
-
 	return <Outlet />;
 }
