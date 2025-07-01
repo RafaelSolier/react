@@ -61,15 +61,12 @@ export default function RegisterForm(props: RegisterFormProps) {
 		try {
 			await register(props.formData, props.formData.isClient);
 
-			// Después del registro, verificar el rol y redirigir
-			setTimeout(() => {
-				const role = getRoleBasedOnToken();
-				if (role === "ROLE_PROVEEDOR") {
-					navigate("/servicios");
-				} else {
-					navigate("/dashboard"); // Para clientes
-				}
-			}, 100);
+			// Redirigir inmediatamente según el tipo de usuario registrado
+			if (props.formData.isClient) {
+				navigate("/serviciosCliente", { replace: true });
+			} else {
+				navigate("/servicios", { replace: true });
+			}
 		} catch (error: any) {
 			console.error("Error al registrar:", error);
 			alert(error.response?.data?.message || "Error al registrar");
