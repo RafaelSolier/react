@@ -1,10 +1,11 @@
 // src/components/Navbar.tsx
-import React from "react";
+import React, {useState, useEffect} from "react";
 import {Menu, MenuButton, MenuItem, MenuItems} from "@headlessui/react";
 import {Briefcase, ChevronDown, UserCircle} from "lucide-react";
 import Button from "./Button";
 import { useNavigate, useLocation, Link } from "react-router-dom";
 import {useAuthContext} from "@contexts/AuthContext.tsx";
+import {getRoleBasedOnToken} from "../utils/getRoleBasedOnToken.ts";
 
 interface NavbarProps {
   avatarUrl: string;
@@ -22,6 +23,15 @@ export const Navbar: React.FC<NavbarProps> = ({
   const navigate = useNavigate();
   const location = useLocation();
   const { logout } = useAuthContext();
+    const [role, setRole] = useState<string | null>(null);
+
+    useEffect(() => {
+        const fetchRole = async () => {
+            const userRole = await getRoleBasedOnToken();
+            setRole(userRole);
+        };
+        fetchRole();
+    }, []);
 
   const handleLogout = () => {
     // 2. Avisar al contexto que cerramos sesión
@@ -43,8 +53,17 @@ export const Navbar: React.FC<NavbarProps> = ({
 
         {/* Botones de navegación */}
         <div className="hidden sm:flex space-x-4">
-          <Button message="Mis Servicios" to="/serviciosCliente" />
-          <Button message="Mis Reservas" to="/reservasCliente" />
+            {role === "ROLE_CLIENTE" ? (
+                <>
+                    <Button message="Mis Servicios" to="/serviciosCliente" />
+                    <Button message="Mis Reservas" to="/reservasCliente" />
+                </>
+            ) : role === "ROLE_PROVEEDOR" ? (
+                <>
+                    <Button message="Mis Servicios" to="/servicios" />
+                    <Button message="Mis Reservas" to="/reservas" />
+                </>
+            ) : null}
         </div>
 
         {/* Perfil */}
