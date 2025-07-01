@@ -27,6 +27,8 @@ import { ReservationForm } from "@components/ReservationForm";
 import { useAuthContext } from "@contexts/AuthContext";
 import {AuthMeDto} from "@interfaces/auth/AuthMeDto.ts";
 import {getMeInfo} from "@services/auth/me.ts";
+import { obtenerCategorias } from "@services/servicio/servicioService";
+
 
 const ServiciosClientePage: React.FC = () => {
   const { userId } = useAuthContext();        // <-- extrae aquí el clienteId
@@ -53,6 +55,8 @@ const ServiciosClientePage: React.FC = () => {
   const [reservingServiceId, setReservingServiceId] = useState<number | null>(null);
 
   const [user, setUser] = useState<AuthMeDto>();
+
+  const [categorias, setCategorias] = useState<string[]>([]);
 
   // 1) carga inicial
   useEffect(() => {
@@ -90,6 +94,19 @@ const ServiciosClientePage: React.FC = () => {
     })();
   }, [viewingResenasId]);
 
+  // Cargar categorias
+  useEffect(() => {
+    const cargarCategorias = async () => {
+      try {
+        const data = await obtenerCategorias();
+        setCategorias(data);
+      } catch (error) {
+        console.error("Error al cargar categorías:", error);
+      }
+    };
+    cargarCategorias();
+  }, []);
+
   async function cargarActivos() {
     const userget = await getMeInfo();
     setUser(userget);
@@ -103,6 +120,11 @@ const ServiciosClientePage: React.FC = () => {
       setLoading(false);
     }
   }
+
+  const handleSelectChange = (e: ChangeEvent<HTMLSelectElement>) => {
+    const { name, value } = e.target;
+    setFilters(f => ({ ...f, [name]: value }));
+  };
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -160,13 +182,19 @@ const ServiciosClientePage: React.FC = () => {
       {/* Filtros */}
       <div className="max-w-7xl mx-auto px-4 py-4">
         <form onSubmit={handleSearch} className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          <input
-            name="categoria"
-            placeholder="Categoría"
-            value={filters.categoria}
-            onChange={handleChange}
-            className="px-3 py-2 border rounded"
-          />
+          <select
+              name="categoria"
+              value={filters.categoria}
+              onChange={handleSelectChange}
+              className="px-3 py-2 border rounded"
+          >
+            <option value="">Todas las categorías</option>
+            {categorias.map((cat) => (
+                <option key={cat} value={cat}>
+                  {cat}
+                </option>
+            ))}
+          </select>
           <div className="flex space-x-2">
             <input
               name="precioMin"

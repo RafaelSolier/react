@@ -71,3 +71,13 @@ export async function buscarServicios(params: BuscarParams): Promise<ServicioRes
   });
   return response.data;
 }
+
+export const obtenerCategorias = async (): Promise<string[]> => {
+
+    const Apis = await Api.getInstance();
+    const response = await Apis.get<null, string[]>({
+        url: `/api/servicios/categorias`
+    });
+    return response.data;
+
+};
