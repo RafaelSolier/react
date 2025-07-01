@@ -14,7 +14,6 @@ interface NavbarProps {
 }
 
 export const Navbar: React.FC<NavbarProps> = ({
-  avatarUrl,
   userName,
   badgeLabel = "Proveedor",
   onLogout,
@@ -43,8 +42,8 @@ export const Navbar: React.FC<NavbarProps> = ({
 
         {/* Botones de navegación */}
         <div className="hidden sm:flex space-x-4">
-          <Button message="Mis Servicios" to="/servicios" />
-          <Button message="Mis Reservas" to="/reservas" />
+          <Button message="Mis Servicios" to="/serviciosCliente" />
+          <Button message="Mis Reservas" to="/reservasCliente" />
         </div>
 
         {/* Perfil */}

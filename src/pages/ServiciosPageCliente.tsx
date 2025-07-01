@@ -5,13 +5,14 @@ import React, {
   ChangeEvent,
   FormEvent,
 } from "react";
-import { Search, Calendar, Star } from "lucide-react";
+import { Search, Calendar, Star, X } from "lucide-react";
 import { Navbar } from "@components/Navbar";
 import Footer from "@components/Footer";
-import Button from "@components/Button";
+import { ReservaRequest } from "@interfaces/reserva/ReservaRequest";
 import { BuscarParams } from "@interfaces/servicio/BuscarParams";
 import { ServicioResponse } from "@interfaces/servicio/ServicioResponse";
 import { HorarioResponse } from "@interfaces/disponibilidades/HorarioResponse";
+import { ResenaResponse } from "@interfaces/resena/ResenaResponse";
 import {
   obtenerServiciosActivos,
   buscarServicios,
@@ -19,13 +20,18 @@ import {
 import {
   obtenerHorariosPorServicio,
 } from "@services/disponibilidad/horarioService";
+import { obtenerResenasPorServicio } from "@services/resena/resenaService";
+import { crearReserva } from "@services/reserva/reservaService";
+import { format } from "date-fns";
+import { ReservationForm } from "@components/ReservationForm";
+import { useAuthContext } from "@contexts/AuthContext";
 
 const ServiciosClientePage: React.FC = () => {
+  const { userId } = useAuthContext();        // <-- extrae aquí el clienteId
   const [servicios, setServicios] = useState<ServicioResponse[]>([]);
-  const [horariosMap, setHorariosMap] = useState<
-    Record<number, HorarioResponse[]>
-  >({});
   const [loading, setLoading] = useState(true);
+
+  // filtros
   const [filters, setFilters] = useState<BuscarParams>({
     categoria: "",
     direccion: "",
@@ -36,95 +42,118 @@ const ServiciosClientePage: React.FC = () => {
     size: 10,
   });
 
-  // 1) Carga inicial de servicios
+  // cache de horarios y reseñas
+  const [horariosMap, setHorariosMap] = useState<Record<number, HorarioResponse[]>>({});
+  const [resenasMap, setResenasMap] = useState<Record<number, ResenaResponse[]>>({});
+
+  // modales
+  const [viewingResenasId, setViewingResenasId] = useState<number | null>(null);
+  const [reservingServiceId, setReservingServiceId] = useState<number | null>(null);
+
+  // 1) carga inicial
   useEffect(() => {
     cargarActivos();
   }, []);
 
-  // 2) Cada vez que 'servicios' cambia, carga sus horarios
+  // 2) al cambiar servicios carga horarios
   useEffect(() => {
     if (!servicios.length) return;
     (async () => {
-      const map: Record<number, HorarioResponse[]> = {};
+      const m: Record<number, HorarioResponse[]> = {};
       await Promise.all(
         servicios.map(async (s) => {
           try {
-            map[s.id] = await obtenerHorariosPorServicio(s.id);
-          } catch (err) {
-            map[s.id] = [];
-            console.error(
-              "No se pudieron cargar horarios para servicio",
-              s.id,
-              err
-            );
+            m[s.id] = await obtenerHorariosPorServicio(s.id);
+          } catch {
+            m[s.id] = [];
           }
         })
       );
-      setHorariosMap(map);
+      setHorariosMap(m);
     })();
   }, [servicios]);
+
+  // 3) al abrir reseñas, carga si no está
+  useEffect(() => {
+    if (viewingResenasId == null || resenasMap[viewingResenasId]) return;
+    (async () => {
+      try {
+        const data = await obtenerResenasPorServicio(viewingResenasId);
+        setResenasMap(m => ({ ...m, [viewingResenasId]: data }));
+      } catch {
+        setResenasMap(m => ({ ...m, [viewingResenasId]: [] }));
+      }
+    })();
+  }, [viewingResenasId]);
 
   async function cargarActivos() {
     setLoading(true);
     try {
       const data = await obtenerServiciosActivos();
       setServicios(data);
-    } catch (err) {
-      console.error("Error al cargar servicios activos:", err);
+    } catch {
+      console.error("Error al cargar servicios activos");
     } finally {
       setLoading(false);
     }
   }
 
-  const handleChange = (
-    e: ChangeEvent<HTMLInputElement | HTMLSelectElement>
-  ) => {
+  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setFilters((f) => ({
+    setFilters(f => ({
       ...f,
-      [name]:
-        name.startsWith("precio") ||
-        name === "calificacionMin" ||
-        name === "page" ||
-        name === "size"
-          ? Number(value)
-          : value,
+      [name]: ["precioMin","precioMax","calificacionMin","page","size"].includes(name)
+        ? Number(value)
+        : value,
     }));
   };
-
   const handleSearch = async (e: FormEvent) => {
     e.preventDefault();
     setLoading(true);
     try {
       const results = await buscarServicios(filters);
       setServicios(results);
-    } catch (err) {
-      console.error("Error al buscar servicios:", err);
+    } catch {
+      console.error("Error al buscar servicios");
     } finally {
       setLoading(false);
     }
   };
 
+  // reservas
+  const handleReserveClick = (id: number) => setReservingServiceId(id);
+  const handleReserveSubmit = async (req: ReservaRequest) => {
+    if (!userId) {
+      alert("Necesitas iniciar sesión para reservar");
+      return;
+    }
+    try {
+      await crearReserva(userId, req);      // <-- usa directamente userId
+      alert("Reserva creada exitosamente");
+    } catch (err) {
+      console.error(err);
+      alert("No se pudo crear la reserva");
+    } finally {
+      setReservingServiceId(null);
+    }
+  };
+
+  const closeResenas = () => setViewingResenasId(null);
+
   return (
     <div className="min-h-screen flex flex-col bg-gray-50">
-      <Navbar avatarUrl="#" userName="Usuario"/>
+      <Navbar avatarUrl="#" userName="Cliente" />
 
       {/* Header */}
       <div className="bg-white shadow-sm">
-        <div className="max-w-7xl mx-auto flex justify-between items-center px-4 py-6">
-          <h1 className="text-2xl font-bold text-gray-900">
-            Servicios Disponibles
-          </h1>
-          {/* <Button message="Ver Todos" onClick={cargarActivos} /> */}
+        <div className="max-w-7xl mx-auto px-4 py-6">
+          <h1 className="text-2xl font-bold text-gray-900">Servicios Disponibles</h1>
         </div>
       </div>
 
       {/* Filtros */}
       <div className="max-w-7xl mx-auto px-4 py-4">
-        <form
-          onSubmit={handleSearch}
-          className="grid grid-cols-1 sm:grid-cols-3 gap-4"
-        >
+        <form onSubmit={handleSearch} className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           <input
             name="categoria"
             placeholder="Categoría"
@@ -132,13 +161,6 @@ const ServiciosClientePage: React.FC = () => {
             onChange={handleChange}
             className="px-3 py-2 border rounded"
           />
-          {/* <input
-            name="direccion"
-            placeholder="Dirección"
-            value={filters.direccion}
-            onChange={handleChange}
-            className="px-3 py-2 border rounded"
-          /> */}
           <div className="flex space-x-2">
             <input
               name="precioMin"
@@ -176,7 +198,7 @@ const ServiciosClientePage: React.FC = () => {
         </form>
       </div>
 
-      {/* Tabla de servicios */}
+      {/* Tabla */}
       <div className="flex-1 max-w-7xl mx-auto px-4 py-6">
         {loading ? (
           <div className="text-center text-gray-500">Cargando servicios...</div>
@@ -196,20 +218,20 @@ const ServiciosClientePage: React.FC = () => {
               <tbody>
                 {servicios.length === 0 ? (
                   <tr>
-                    <td colSpan={5} className="px-6 py-4 text-center text-gray-500">
+                    <td colSpan={6} className="px-6 py-4 text-center text-gray-500">
                       No se encontraron servicios
                     </td>
                   </tr>
                 ) : (
-                  servicios.map((s) => (
+                  servicios.map(s => (
                     <tr key={s.id} className="border-t">
                       <td className="px-6 py-4">{s.nombre}</td>
                       <td className="px-6 py-4">{s.descripcion}</td>
                       <td className="px-6 py-4">S/ {s.precio.toFixed(2)}</td>
                       <td className="px-6 py-4">{s.categoria}</td>
                       <td className="px-6 py-4 space-y-1">
-                        {(horariosMap[s.id] && horariosMap[s.id].length > 0) ? (
-                          horariosMap[s.id].map((h) => (
+                        {(horariosMap[s.id] || []).length > 0 ? (
+                          horariosMap[s.id].map(h => (
                             <div key={h.id} className="text-sm">
                               {h.diaSemana} {h.horaInicio}-{h.horaFin}
                             </div>
@@ -220,14 +242,16 @@ const ServiciosClientePage: React.FC = () => {
                       </td>
                       <td className="px-6 py-4 space-x-2">
                         <button
-                          onClick={() => console.log("Reservar", s.id)}
+                          onClick={() => handleReserveClick(s.id)}
                           className="inline-flex items-center hover:text-indigo-600"
+                          title="Reservar"
                         >
                           <Calendar className="w-5 h-5" />
                         </button>
                         <button
-                          onClick={() => console.log("Reseñar", s.id)}
+                          onClick={() => setViewingResenasId(s.id)}
                           className="inline-flex items-center hover:text-yellow-500"
+                          title="Ver reseñas"
                         >
                           <Star className="w-5 h-5" />
                         </button>
@@ -240,6 +264,60 @@ const ServiciosClientePage: React.FC = () => {
           </div>
         )}
       </div>
+
+      {/* Formulario de reserva */}
+      {reservingServiceId !== null && (
+        <div className="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center z-20">
+          <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-md">
+            <ReservationForm
+              servicioId={reservingServiceId}
+              onCancel={() => setReservingServiceId(null)}
+              onSubmit={handleReserveSubmit}
+            />
+          </div>
+        </div>
+      )}
+
+      {/* Panel de reseñas */}
+      {viewingResenasId !== null && (
+        <div className="fixed inset-0 bg-black bg-opacity-30 flex justify-center items-start pt-20 z-20">
+          <div className="bg-white rounded-lg shadow-lg w-full max-w-md mx-4 p-6 relative">
+            <button
+              onClick={closeResenas}
+              className="absolute top-3 right-3 text-gray-500 hover:text-gray-700"
+            >
+              <X className="w-5 h-5" />
+            </button>
+            <h2 className="text-2xl font-bold mb-4">Reseñas</h2>
+            {resenasMap[viewingResenasId] == null ? (
+              <p className="text-gray-500">Cargando reseñas...</p>
+            ) : resenasMap[viewingResenasId].length === 0 ? (
+              <p className="text-gray-600">Aún no hay reseñas.</p>
+            ) : (
+              <ul className="space-y-4 max-h-64 overflow-y-auto">
+                {resenasMap[viewingResenasId].map(r => (
+                  <li key={r.id} className="border-b pb-3">
+                    <div className="flex items-center mb-1">
+                      {Array.from({ length: 5 }).map((_, i) => (
+                        <Star
+                          key={i}
+                          className={`w-5 h-5 mr-1 ${
+                            i < r.calificacion ? "text-yellow-400" : "text-gray-300"
+                          }`}
+                        />
+                      ))}
+                      <span className="ml-2 text-sm text-gray-500">
+                        {format(new Date(r.fecha), "dd/MM/yyyy")}
+                      </span>
+                    </div>
+                    <p className="text-gray-800">{r.comentario}</p>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+        </div>
+      )}
 
       <Footer />
     </div>

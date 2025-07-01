@@ -7,6 +7,7 @@ import ServiciosPage from "@pages/ServiciosPage";
 import NotFound from "@pages/NotFoundPage";
 import ReservasPage from "@pages/ReservasPage";
 import ServiciosPageCliente from "@pages/ServiciosPageCliente";
+import ReservasPageCliente from "@pages/ReservasPageCliente";
 
 // Para rutas públicas que no deje entrar a quien ya esté logueado
 function PublicRoute({ children }: { children: JSX.Element }) {
@@ -45,7 +46,8 @@ export const router = createBrowserRouter([
         children: [
           { path: "servicios", element: <ServiciosPage /> },
           { path: "reservas", element: <ReservasPage /> },
-          { path: "serviciosCliente", element: <ServiciosPageCliente /> }, // TODO: Implementar
+          { path: "serviciosCliente", element: <ServiciosPageCliente /> },
+          { path: "reservasCliente", element: <ReservasPageCliente/> }, // TODO: Implementar
         ],
       },
 

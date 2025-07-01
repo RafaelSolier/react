@@ -1,5 +1,5 @@
 export interface ReservaRequest {
-    idServicio: number;
+    servicioId: number;
     fechaReserva: string;
     direccion: string;
     }
