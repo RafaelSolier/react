@@ -1,6 +1,7 @@
 import Api from "@services/api";
 import { ServicioResponse } from "@interfaces/servicio/ServicioResponse";
 import { ServicioRequest } from "@interfaces/servicio/ServicioRequest";
+import { BuscarParams } from "@interfaces/servicio/BuscarParams";
 
 export async function crearServicio(
     proveedorId: number,
@@ -52,4 +53,21 @@ export async function cambiarEstadoServicio(
         { url: `/api/servicios/${servicioId}/estado?activo=${activo}` }
     );
     return response.data;
+}
+
+export async function obtenerServiciosActivos(): Promise<ServicioResponse[]> {
+  const Apis = await Api.getInstance();
+  const response = await Apis.get<null, ServicioResponse[]>({
+    url: `/api/servicios/activos`,
+  });
+  return response.data;
+}
+
+export async function buscarServicios(params: BuscarParams): Promise<ServicioResponse[]> {
+  const Apis = await Api.getInstance();
+  const response = await Apis.get<null, ServicioResponse[]>({
+    url: `/api/servicios`,
+    params,
+  });
+  return response.data;
 }

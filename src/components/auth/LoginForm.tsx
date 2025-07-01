@@ -37,7 +37,7 @@ export default function LoginForm() {
 				if (role === "ROLE_PROVEEDOR") {
 					navigate("/servicios");
 				} else if (role === "ROLE_CLIENTE") {
-					navigate("/dashboard");
+					navigate("/serviciosCliente");
 				} else {
 					navigate("/");
 				}
