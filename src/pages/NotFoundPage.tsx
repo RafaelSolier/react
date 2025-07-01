@@ -1,9 +1,17 @@
 import { useNavigate, useLocation } from "react-router-dom";
+import {useAuthContext} from "@contexts/AuthContext.tsx";
 
 export default function NotFoundPage() {
 	const navigate = useNavigate();
 	const location = useLocation();
+	const { logout } = useAuthContext();
 
+	const handleLogout = () => {
+		logout(); // Esto ya maneja limpiar el token y el userId
+		navigate(`/auth/login?from=${encodeURIComponent(location.pathname)}`, {
+			replace: true,
+		});
+	};
 	return (
 		<div className="min-h-screen flex flex-col items-center justify-center bg-gray-100">
 			<div className="text-center">
@@ -25,7 +33,7 @@ export default function NotFoundPage() {
 						Volver Atrás
 					</button>
 					<button 
-						onClick={() => navigate("/auth/login")}
+						onClick={handleLogout}
 						className="bg-primary text-white px-6 py-2 rounded-lg hover:bg-primary-dark transition-colors"
 					>
 						Ir al Login

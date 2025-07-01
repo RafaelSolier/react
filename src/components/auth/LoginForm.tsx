@@ -29,19 +29,17 @@ export default function LoginForm() {
 
 		try {
 			await login(formData);
-			setSuccessMessage("Login exitoso!");
 
-			// Verificar el rol y redirigir
-			setTimeout(() => {
-				const role = getRoleBasedOnToken();
-				if (role === "ROLE_PROVEEDOR") {
-					navigate("/servicios");
-				} else if (role === "ROLE_CLIENTE") {
-					navigate("/serviciosCliente");
-				} else {
-					navigate("/");
-				}
-			}, 500);
+			// Redirigir inmediatamente según el rol, sin setTimeout
+			const role = getRoleBasedOnToken();
+			if (role === "ROLE_PROVEEDOR") {
+				navigate("/servicios", { replace: true });
+			} else if (role === "ROLE_CLIENTE") {
+				navigate("/serviciosCliente", { replace: true });
+			} else {
+				// Fallback si no se puede determinar el rol
+				navigate("/", { replace: true });
+			}
 		} catch (error: any) {
 			setError(error.response?.data?.message || "Error al iniciar sesión");
 		}

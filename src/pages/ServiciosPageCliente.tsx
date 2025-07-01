@@ -25,6 +25,8 @@ import { crearReserva } from "@services/reserva/reservaService";
 import { format } from "date-fns";
 import { ReservationForm } from "@components/ReservationForm";
 import { useAuthContext } from "@contexts/AuthContext";
+import {AuthMeDto} from "@interfaces/auth/AuthMeDto.ts";
+import {getMeInfo} from "@services/auth/me.ts";
 
 const ServiciosClientePage: React.FC = () => {
   const { userId } = useAuthContext();        // <-- extrae aquí el clienteId
@@ -49,6 +51,8 @@ const ServiciosClientePage: React.FC = () => {
   // modales
   const [viewingResenasId, setViewingResenasId] = useState<number | null>(null);
   const [reservingServiceId, setReservingServiceId] = useState<number | null>(null);
+
+  const [user, setUser] = useState<AuthMeDto>();
 
   // 1) carga inicial
   useEffect(() => {
@@ -87,6 +91,8 @@ const ServiciosClientePage: React.FC = () => {
   }, [viewingResenasId]);
 
   async function cargarActivos() {
+    const userget = await getMeInfo();
+    setUser(userget);
     setLoading(true);
     try {
       const data = await obtenerServiciosActivos();
@@ -142,7 +148,7 @@ const ServiciosClientePage: React.FC = () => {
 
   return (
     <div className="min-h-screen flex flex-col bg-gray-50">
-      <Navbar avatarUrl="#" userName="Cliente" />
+      <Navbar avatarUrl="#" userName={user == null? "User": user.nombre} badgeLabel = "Cliente"/>
 
       {/* Header */}
       <div className="bg-white shadow-sm">
