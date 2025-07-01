@@ -75,14 +75,15 @@ const ServicioRow: React.FC<ServicioRowProps> = ({
                     </button>
                     <button
                         onClick={() => onViewSchedule(servicio.id)}
-                        className="text-yellow-600 hover:text-yellow-800 transition-colors p-1 rounded hover:bg-yellow-50"
+                        className="text-purple-600 hover:text-purple-800 transition-colors p-1 rounded hover:bg-purple-50"
+
                         title="Ver horarios"
                     >
                         <Clock className="h-4 w-4" />
                     </button>
                     <button
                         onClick={() => onViewReviews(servicio.id)}
-                        className="text-purple-600 hover:text-purple-800 transition-colors p-1 rounded hover:bg-purple-50"
+                        className="text-yellow-600 hover:text-yellow-800 transition-colors p-1 rounded hover:bg-yellow-50"
                         title="Ver reseñas"
                     >
                         <Star className="h-4 w-4" />
