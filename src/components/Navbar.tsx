@@ -14,7 +14,6 @@ interface NavbarProps {
 }
 
 export const Navbar: React.FC<NavbarProps> = ({
-  avatarUrl,
   userName,
   badgeLabel = "Proveedor",
   onLogout,

@@ -42,27 +42,23 @@ const ReservasPageCliente: React.FC = () => {
     })();
   }, [clienteId]);
 
-const handleCancel = async (reservaId: number) => {
-    if (!window.confirm("¿Cancelar esta reserva?")) return;
-    setActingId(reservaId);
-    try {
-        // Llama a cancelarReserva con clienteId y reservaId
-        await cancelarReserva(clienteId!, reservaId);
-
-        // Actualiza el estado localmente
-        setReservas(prev =>
-            prev.map(r =>
-                r.id === reservaId ? { ...r, estado: "CANCELADA" } : r
-            )
-        );
-    } catch (err) {
-        console.error("Error cancelando reserva:", err);
-        alert(
-            `Error: ${(err as any).response?.data?.message || "No se pudo cancelar la reserva"}`
-        );
-    } finally {
-        setActingId(null);
-    }
+  const handleCancel = async (reservaId: number) => {
+  if (!window.confirm("¿Cancelar esta reserva?")) return;
+  setActingId(reservaId);
+  try {
+    // CORRECCIÓN: Enviar clienteId primero y luego reservaId
+    await cancelarReserva(clienteId!, reservaId);
+    
+    // Actualización optimizada del estado
+    setReservas(prev => prev.map(r => 
+      r.id === reservaId ? {...r, estado: "CANCELADA"} : r
+    ));
+  } catch (err) {
+    console.error("Error cancelando reserva:", err);
+    alert(`Error: ${(err as any).response?.data?.message || "No se pudo cancelar la reserva"}`);
+  } finally {
+    setActingId(null);
+  }
 };
 
   if (loading) {
