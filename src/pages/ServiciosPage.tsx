@@ -14,7 +14,6 @@ import {
   cambiarEstadoServicio
 } from "@services/servicio/servicioService";
 
-import { obtenerResenasPorServicio } from "@services/resena/resenaService";
 import Footer from '@components/Footer';
 import { ServiceForm } from '@components/ServiceForm';
 import { crearHorarioDeServicio } from '@services/disponibilidad/horarioService';

@@ -16,7 +16,7 @@ interface NavbarProps {
 
 export const Navbar: React.FC<NavbarProps> = ({
   userName,
-  badgeLabel = "Proveedor",
+  badgeLabel = " ",
   onLogout,
 }) => {
   const navigate = useNavigate();
@@ -68,7 +68,7 @@ export const Navbar: React.FC<NavbarProps> = ({
         {/* Perfil */}
         <div className="flex items-center space-x-4">
           <span className="bg-indigo-800 text-white text-sm font-semibold px-3 py-1 rounded-full">
-            {badgeLabel}
+            {role == "ROLE_PROVEEDOR"? "Proveedor":"Cliente"}
           </span>
 
                     <Menu as="div" className="relative">
