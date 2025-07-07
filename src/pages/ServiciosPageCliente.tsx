@@ -25,8 +25,6 @@ import { crearReserva } from "@services/reserva/reservaService";
 import { format } from "date-fns";
 import { ReservationForm } from "@components/ReservationForm";
 import { useAuthContext } from "@contexts/AuthContext";
-import {AuthMeDto} from "@interfaces/auth/AuthMeDto.ts";
-import {getMeInfo} from "@services/auth/me.ts";
 import { obtenerCategorias } from "@services/servicio/servicioService";
 
 
@@ -38,7 +36,6 @@ const ServiciosClientePage: React.FC = () => {
   // filtros
   const [filters, setFilters] = useState<BuscarParams>({
     categoria: "",
-    direccion: "",
     precioMin: "",
     precioMax: "",
     calificacionMin: "",
@@ -53,8 +50,6 @@ const ServiciosClientePage: React.FC = () => {
   // modales
   const [viewingResenasId, setViewingResenasId] = useState<number | null>(null);
   const [reservingServiceId, setReservingServiceId] = useState<number | null>(null);
-
-  const [user, setUser] = useState<AuthMeDto>();
 
   const [categorias, setCategorias] = useState<string[]>([]);
 
@@ -108,8 +103,6 @@ const ServiciosClientePage: React.FC = () => {
   }, []);
 
   async function cargarActivos() {
-    const userget = await getMeInfo();
-    setUser(userget);
     setLoading(true);
     try {
       const data = await obtenerServiciosActivos();
@@ -170,7 +163,7 @@ const ServiciosClientePage: React.FC = () => {
 
   return (
     <div className="min-h-screen flex flex-col bg-gray-50">
-      <Navbar avatarUrl="#" userName={user == null? "User": user.nombre} badgeLabel = "Cliente"/>
+      <Navbar/>
 
       {/* Header */}
       <div className="bg-white shadow-sm">

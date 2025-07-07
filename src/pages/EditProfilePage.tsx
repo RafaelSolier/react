@@ -1,5 +1,5 @@
 import Profile from "@components/Profile";
-import React, { ChangeEvent, FormEvent, useState, useEffect } from "react";
+import { ChangeEvent, FormEvent, useState, useEffect } from "react";
 import { getRoleBasedOnToken } from "src/utils/getRoleBasedOnToken";
 import { useNavigate } from "react-router-dom";
 import { useAuthContext } from "@contexts/AuthContext";
@@ -11,7 +11,6 @@ import {Navbar} from "@components/Navbar.tsx";
 
 export default function EditProfilePage() {
 	const navigate = useNavigate();
-	const [userId, setUserId] = useState<number | null>(null);
 	const [formData, setFormData] = useState({
 		id: 0,
 		nombre: "",
@@ -20,8 +19,8 @@ export default function EditProfilePage() {
 		descripcion: "",
 		role: ['ROLE_CLIENTE'],
 	});
-	const { logout } = useAuthContext();
-
+	const { logout, userInfo, userId } = useAuthContext();
+	const [uId, setUId] = useState<number>(0);
 	useEffect(() => {
 		fetchUserData();
 	}, []);
@@ -29,8 +28,6 @@ export default function EditProfilePage() {
 	async function fetchUserData() {
 		try {
 			const user = await getMeInfo();
-			setUserId(user.id);
-
 			if (getRoleBasedOnToken() === "ROLE_CLIENTE") {
 				// Si el backend devuelve nombre completo, dividirlo
 				const nombreCompleto = user.nombre || "";
@@ -87,17 +84,17 @@ export default function EditProfilePage() {
 	}
 
 	async function fetchUpdateUser() {
-		if (!userId) return;
+		if (!userId || !userInfo) return;
 
 		try {
 			if (getRoleBasedOnToken() === "ROLE_PROVEEDOR") {
-				await updateProveedor(userId, {
+				await updateProveedor(userInfo.idCD, {
 					nombre: formData.nombre,
 					descripcion: formData.descripcion,
 					telefono: formData.telefono
 				});
 			} else if (getRoleBasedOnToken() === "ROLE_CLIENTE") {
-				await updateCliente(userId, {
+				await updateCliente(userInfo.idCD, {
 					nombre: formData.nombre,
 					apellido: formData.apellido,
 					telefono: formData.telefono,
@@ -118,7 +115,7 @@ export default function EditProfilePage() {
 
 	return (
 		<div>
-		<Navbar avatarUrl="#" userName={formData.nombre} />
+		<Navbar />
 
 		<main className="p-10 max-w-4xl mx-auto">
 
@@ -193,7 +190,7 @@ export default function EditProfilePage() {
 			</article>
 
 			<div className="bg-white p-8 rounded-lg shadow-lg mb-6">
-				<Profile setUserId={setUserId} />
+				<Profile setUserId={(id) => setUId(id)}/>
 			</div>
 
 			<button 

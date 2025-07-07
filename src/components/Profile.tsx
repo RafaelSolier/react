@@ -5,7 +5,7 @@ import { getRoleBasedOnToken } from "src/utils/getRoleBasedOnToken";
 import {AuthMeDto} from "@interfaces/auth/AuthMeDto.ts";
 
 interface ProfileProps {
-	setUserId: (id: number | null) => void;
+	setUserId: (id:number)=>void;
 }
 
 export default function Profile(props: ProfileProps) {
@@ -24,11 +24,11 @@ export default function Profile(props: ProfileProps) {
 			if (role === "ROLE_PROVEEDOR") {
 				setProfileInfo(userData);
 				setIsProveedor(true);
-				props.setUserId(userData.id);
+				props.setUserId;
 			} else if (role === "ROLE_CLIENTE") {
 				setProfileInfo(userData);
 				setIsProveedor(false);
-				props.setUserId(userData.id);
+				props.setUserId;
 			} else {
 				console.error("Error: No role found");
 			}
